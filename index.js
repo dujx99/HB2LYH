@@ -1,7 +1,5 @@
 const qs = new URLSearchParams(location.search);
-const presetMsgIdx = qs.get("msg"); // optional index to force a message
 const presetSongIdx = qs.get("song"); // optional index to force a song
-const presetPalette = qs.get("palette"); // optional palette idx
 const messageEl = document.getElementById("message");
 const headline = document.getElementById("headline");
 const sub = document.getElementById("sub");
@@ -11,13 +9,21 @@ const fixBtn = document.getElementById("fixBtn");
 const paletteEl = document.getElementById("palette");
 const card = document.getElementById("card");
 const avatar = document.getElementById("avatar");
+const page1 = document.getElementById("page-1");
+const page2 = document.getElementById("page-2");
+const candleEle = document.getElementById("candle");
+const wishTipsEle = document.getElementById("wishTips");
+const msgBox = document.getElementById("messageBox");
+const msgText = document.getElementById("messageText");
 
 let current = {
-  msgIdx: null,
   songIdx: null,
   paletteIdx: null,
   audioEl: null,
 };
+
+let charIndex = 0;
+let typingTimer = null;
 
 function pickRandom(arr) {
   return Math.floor(Math.random() * arr.length);
@@ -43,18 +49,17 @@ function hexToRgba(hex, a) {
 }
 
 /* show message with tiny animation */
+function showLyric(text) {
+  typeWriterWrite(text, () => {
+    avatar.innerText = EMOJIS[pickRandom(EMOJIS)];
+  });
+}
+
 function showMessage(i) {
-  const text = MESSAGES[i] || "祝你生日快乐！";
-  // headline.innerText = "生日快乐 🎂";
-  messageEl.style.opacity = 0;
-  setTimeout(() => {
-    messageEl.innerText = text;
-    messageEl.style.opacity = 1;
-  }, 220);
-  current.msgIdx = i;
-  // occasional emoji avatar change
-  const emojis = ["🎉", "🥳", "🎂", "💫", "✨", "🎈"];
-  avatar.innerText = emojis[i % emojis.length];
+  const text = MESSAGES[i] || "生日快乐 🎂";
+  typeWriterWrite(text, () => {
+    avatar.innerText = EMOJIS[pickRandom(EMOJIS)];
+  });
 }
 
 /* music handling */
@@ -80,6 +85,8 @@ function playSong(i) {
   });
   musicBtn.after(audio);
   current.audioEl = audio;
+  sub.innerText = AUDIO_LIST[i].name;
+  showLyric(AUDIO_LIST[i].lyrics);
   current.songIdx = i;
 }
 
@@ -87,32 +94,17 @@ function playSong(i) {
 function makeShareLink() {
   const base = location.origin + location.pathname;
   const params = new URLSearchParams();
-  if (current.msgIdx != null) params.set("msg", current.msgIdx);
   if (current.songIdx != null) params.set("song", current.songIdx);
   if (current.paletteIdx != null) params.set("palette", current.paletteIdx);
   const url = base + "?" + params.toString();
   navigator.clipboard
     ?.writeText(url)
     .then(() => {
-      console.log("分享链接已复制到剪贴板！");
+      alert("分享链接已复制到剪贴板~！");
     })
     .catch(() => {
       prompt("复制下面的链接：", url);
     });
-}
-
-/* render palette selectors */
-function renderPaletteSelectors() {
-  PALETTES.forEach((p, idx) => {
-    const s = document.createElement("div");
-    s.className = "swatch";
-    s.title = `配色 ${idx + 1}`;
-    s.style.background = `linear-gradient(135deg, ${p[0]}, ${p[1]})`;
-    s.onclick = () => {
-      applyPalette(idx);
-    };
-    paletteEl.appendChild(s);
-  });
 }
 
 /* confetti simple implementation */
@@ -167,38 +159,68 @@ function burstConfetti() {
   frame();
 }
 
+function switchPage(pageHide, pageShow) {
+  pageShow.classList.remove("hide");
+  pageShow.classList.remove("fade-out");
+  pageHide.classList.add("fade-out");
+  pageHide.addEventListener("transitionend", function handler() {
+    pageHide.classList.add("hide");
+    pageHide.classList.remove("fade-out");
+    pageHide.removeEventListener("transitionend", handler);
+  });
+}
+
+function typeWriterWrite(text, callback) {
+  clearTimeout(typingTimer);
+  msgText.textContent = "";
+  charIndex = 0;
+  msgBox.style.opacity = 1;
+
+  function type() {
+    if (charIndex < text.length) {
+      msgText.textContent += text.charAt(charIndex);
+      charIndex++;
+      typingTimer = setTimeout(type, 80);
+    } else {
+      if (callback) callback();
+    }
+  }
+  type();
+}
+
 /* initialization */
 function init() {
-  renderPaletteSelectors();
   // apply preset palette or random
-  const pIdx =
-    presetPalette !== null &&
-    presetPalette !== undefined &&
-    PALETTES[presetPalette]
-      ? Number(presetPalette)
-      : pickRandom(PALETTES);
+  const pIdx = pickRandom(PALETTES);
   applyPalette(pIdx);
   // choose message and song
-  const msgIdx =
-    presetMsgIdx !== null &&
-    presetMsgIdx !== undefined &&
-    MESSAGES[presetMsgIdx]
-      ? Number(presetMsgIdx)
-      : pickRandom(MESSAGES);
-  showMessage(msgIdx);
-  const songIdx =
+  let songIdx;
+  if (
     presetSongIdx !== null &&
     presetSongIdx !== undefined &&
     AUDIO_LIST[presetSongIdx]
-      ? Number(presetSongIdx)
-      : pickRandom(AUDIO_LIST);
+  ) {
+    songIdx = Number[presetSongIdx];
+    showLyric(AUDIO_LIST[presetSongIdx].lyrics);
+  } else {
+    songIdx = pickRandom(AUDIO_LIST);
+    const msgIdx = pickRandom(MESSAGES);
+    showMessage(msgIdx);
+  }
   current.songIdx = songIdx;
-  playSong(songIdx)
-
+  setTimeout(() => {
+    wishTipsEle.classList.remove("opacity");
+  }, 7000);
   // handlers
+  candleEle.onclick = () => {
+    switchPage(page1, page2);
+    playSong(songIdx);
+  };
   surpriseBtn.onclick = () => {
     const i = pickRandom(MESSAGES);
     showMessage(i);
+    const pIdx = pickRandom(PALETTES);
+    applyPalette(pIdx);
     burstConfetti();
   };
   musicBtn.onclick = () => {
@@ -213,11 +235,11 @@ function init() {
       console.error(e);
       console.log("播放失败，检查音频路径或浏览器策略");
     }
+    const pIdx = pickRandom(PALETTES);
+    applyPalette(pIdx);
+    burstConfetti();
   };
-
   fixBtn.onclick = makeShareLink;
-
-  // small tip in subline
   sub.innerText = "点击“点我抽一条祝福”或“播放随机歌曲”开始吧。";
 }
 

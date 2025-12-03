@@ -1,0 +1,99 @@
+#page-1 {
+  position: relative;
+  height: 100%;
+  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+}
+#wishBox {
+  position: absolute;
+  text-align: center;
+  width: 100%;
+  top: 150px;
+}
+#wishText {
+  color: #ff6171;
+}
+#wishTips {
+  color: #a69090;
+  font-size: 14px;
+}
+#cake {
+  display: block;
+  position: relative;
+  margin: 0 auto 0 auto;
+  scale: 0.5;
+}
+#candle {
+  z-index: 10;
+  cursor: pointer;
+  background: #ffffff;
+  border-radius: 10px;
+  position: absolute;
+  top: 330px;
+  left: 50%;
+  margin-left: -2.5px;
+  margin-top: -2rem;
+  width: 5px;
+  height: 35px;
+  transform: translateY(-800px);
+  backface-visibility: hidden;
+  animation: in 500ms 5s ease-out forwards;
+
+  &:after,
+  &:before {
+    background: rgba(255, 0, 0, 0.4);
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 2.22222222px;
+  }
+}
+#candle:after {
+  top: 25%;
+  left: 0;
+}
+#candle:before {
+  top: 45%;
+  left: 0;
+}
+.fuego {
+  border-radius: 100%;
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  margin-left: -2.2px;
+  width: 6.66666667px;
+  height: 18px;
+}
+.fuego:nth-child(1) {
+  animation: fuego 2s 5.5s infinite;
+}
+.fuego:nth-child(2) {
+  animation: fuego 1.5s 5.5s infinite;
+}
+.fuego:nth-child(3) {
+  animation: fuego 1s 5.5s infinite;
+}
+.fuego:nth-child(4) {
+  animation: fuego 0.5s 5.5s infinite;
+}
+.fuego:nth-child(5) {
+  animation: fuego 0.2s 5.5s infinite;
+}
+@keyframes fuego {
+  0%,
+  100% {
+    background: rgba(254, 248, 97, 0.5);
+    box-shadow: 0 0 40px 10px rgba(248, 233, 209, 0.2);
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    background: rgba(255, 50, 0, 0.1);
+    box-shadow: 0 0 40px 20px rgba(248, 233, 209, 0.2);
+    transform: translateY(-20px) scale(0);
+  }
+}
+@keyframes in {
+  to {
+    transform: translateY(0);
+  }
+}
