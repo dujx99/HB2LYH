@@ -1,42 +1,7 @@
-/* ========== 配置区：在这里放你的 10 条祝福和 10 个音频（本地相对路径或外链） ========== */
-const MESSAGES = [
-  "愿你的每一年都比去年更精彩，生日快乐！",
-  "愿快乐与幸福常伴你左右，愿望都能实现！",
-  "今天你是主角，放肆被宠爱，被祝福吧！",
-  "愿所有美好如期而至，岁岁平安，生日快乐！",
-  "在你人生的这一天，愿光芒为你而来，温柔陪伴你。",
-  "祝你热爱生活，永远保持好奇与勇气！",
-  "新的一岁，新的冒险，新的惊喜，继续向前冲！",
-  "愿你笑口常开，烦恼远离，幸福越来越多！",
-  "愿健康、好运与爱一路同行，生日快乐！",
-  "谢谢你存在于我们生活里，愿你被好事环绕。",
-];
-// audioList 支持本地相对路径（推荐把 audio/01.mp3 ... 放在仓库）或外链（注意版权）
-const AUDIO_LIST = [
-  "audio/01.mp3",
-  "audio/02.mp3",
-  "audio/03.mp3",
-  "audio/04.mp3",
-  "audio/05.mp3",
-  "audio/06.mp3",
-];
-/* ========== 结束配置区 ========== */
-
-/* 颜色主题（每个主题包含两个渐变色 + accent） */
-const PALETTES = [
-  ["#FFEDD5", "#FECACA", "#EF4444"],
-  ["#F0F9FF", "#CFFAFE", "#0369A1"],
-  ["#FEF3C7", "#FDE68A", "#D97706"],
-  ["#ECFCCB", "#D9F99D", "#16A34A"],
-  ["#F5F3FF", "#EDE9FE", "#7C3AED"],
-  ["#FFF1F2", "#FFE4E6", "#DB2777"],
-];
-
 const qs = new URLSearchParams(location.search);
 const presetMsgIdx = qs.get("msg"); // optional index to force a message
 const presetSongIdx = qs.get("song"); // optional index to force a song
 const presetPalette = qs.get("palette"); // optional palette idx
-
 const messageEl = document.getElementById("message");
 const headline = document.getElementById("headline");
 const sub = document.getElementById("sub");
@@ -80,7 +45,7 @@ function hexToRgba(hex, a) {
 /* show message with tiny animation */
 function showMessage(i) {
   const text = MESSAGES[i] || "祝你生日快乐！";
-  headline.innerText = "生日快乐 🎂";
+  // headline.innerText = "生日快乐 🎂";
   messageEl.style.opacity = 0;
   setTimeout(() => {
     messageEl.innerText = text;
@@ -99,9 +64,9 @@ function playSong(i) {
     current.audioEl.remove();
     current.audioEl = null;
   }
-  const src = AUDIO_LIST[i];
+  const src = AUDIO_LIST[i].url;
   if (!src) {
-    alert("没有可用的音频资源");
+    console.log("没有可用的音频资源", i);
     return;
   }
   const audio = document.createElement("audio");
@@ -111,7 +76,7 @@ function playSong(i) {
   audio.style.marginLeft = "10px";
   // ensure user action first (browsers may block autoplay)
   audio.play().catch(() => {
-    alert("浏览器阻止自动播放，请点击播放按钮以开始音乐。");
+    console.log("浏览器阻止自动播放，请点击播放按钮以开始音乐。");
   });
   musicBtn.after(audio);
   current.audioEl = audio;
@@ -129,7 +94,7 @@ function makeShareLink() {
   navigator.clipboard
     ?.writeText(url)
     .then(() => {
-      alert("分享链接已复制到剪贴板！");
+      console.log("分享链接已复制到剪贴板！");
     })
     .catch(() => {
       prompt("复制下面的链接：", url);
@@ -228,6 +193,7 @@ function init() {
       ? Number(presetSongIdx)
       : pickRandom(AUDIO_LIST);
   current.songIdx = songIdx;
+  playSong(songIdx)
 
   // handlers
   surpriseBtn.onclick = () => {
@@ -236,14 +202,19 @@ function init() {
     burstConfetti();
   };
   musicBtn.onclick = () => {
-    // try play selected
     try {
-      playSong(current.songIdx);
+      let n;
+      do {
+        n = pickRandom(AUDIO_LIST);
+      } while (n === current.songIdx);
+      current.songIdx = n;
+      playSong(n);
     } catch (e) {
       console.error(e);
-      alert("播放失败，检查音频路径或浏览器策略");
+      console.log("播放失败，检查音频路径或浏览器策略");
     }
   };
+
   fixBtn.onclick = makeShareLink;
 
   // small tip in subline
