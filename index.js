@@ -95,7 +95,6 @@ function makeShareLink() {
   const base = location.origin + location.pathname;
   const params = new URLSearchParams();
   if (current.songIdx != null) params.set("song", current.songIdx);
-  if (current.paletteIdx != null) params.set("palette", current.paletteIdx);
   const url = base + "?" + params.toString();
   navigator.clipboard
     ?.writeText(url)
@@ -200,7 +199,7 @@ function init() {
     presetSongIdx !== undefined &&
     AUDIO_LIST[presetSongIdx]
   ) {
-    songIdx = Number[presetSongIdx];
+    songIdx = Number(presetSongIdx);
     showLyric(AUDIO_LIST[presetSongIdx].lyrics);
   } else {
     songIdx = pickRandom(AUDIO_LIST);
@@ -214,7 +213,7 @@ function init() {
   // handlers
   candleEle.onclick = () => {
     switchPage(page1, page2);
-    playSong(songIdx);
+    playSong(current.songIdx);
   };
   surpriseBtn.onclick = () => {
     const i = pickRandom(MESSAGES);
