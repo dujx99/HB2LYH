@@ -154,4 +154,11 @@ const AUDIO_LIST = [
     url: "audio/06.mp3",
     lyrics: "你说最好的人会到身边，此刻我也这样想~",
   },
+  {
+    id: "letter",
+    name: "孙燕姿 - 样子",
+    url: "audio/孙燕姿_样子.mp3",
+    lyrics: "",
+    isLetterOnly: true,
+  },
 ];

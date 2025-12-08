@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="cake.css" />
   <link rel="stylesheet" href="card.css" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="font.css" />
 </head>
 
 <body>
@@ -184,6 +185,11 @@
   <div id="page-2" class="page hide">
     <div class="card" id="card">
       <canvas id="confetti"></canvas>
+      <div class="envelope-icon" id="envelopeIcon" title="查看信件">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+        </svg>
+      </div>
       <header>
         <div class="avatar" id="avatar">🎉</div>
         <div>
@@ -198,6 +204,26 @@
       </header>
       <div id="messageBox">
         <span id="messageText"></span>
+      </div>
+    </div>
+  </div>
+  <div id="page-3" class="page hide">
+    <div class="letter-container">
+      <div class="letter-header">
+        <h2>一封特别的信</h2>
+      </div>
+      <div class="letter-content" id="letterContent">
+      </div>
+      <div class="image-gallery">
+        <div class="image-grid" id="imageGrid">
+          <!-- 图片将通过JavaScript动态生成 -->
+        </div>
+      </div>
+    </div>
+    <div class="image-modal" id="imageModal">
+      <div class="modal-content">
+        <span class="close-modal" id="closeModal">&times;</span>
+        <img id="modalImage" src="" alt="大图">
       </div>
     </div>
   </div>
