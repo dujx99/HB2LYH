@@ -295,6 +295,11 @@ audio {
 }
 
 .modal-content img {
+  pointer-events: auto; /* 图片本身可以点击 */
+  cursor: zoom-out; /* 显示缩放光标 */
+}
+
+.modal-content img {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
@@ -336,7 +341,7 @@ audio {
   
   .letter-content {
     padding: 20px;
-    font-size: 16px;
+    font-size: 18px;
   }
   
   .image-grid {

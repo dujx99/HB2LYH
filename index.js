@@ -368,10 +368,17 @@ function init() {
   
   // 模态框关闭事件
   closeModal.onclick = closeImageModal;
+  
+  // 点击模态框关闭（点击背景或非图片区域）
   imageModal.onclick = (e) => {
-    if (e.target === imageModal) {
+    if (e.target === imageModal || e.target === modalImage.parentElement) {
       closeImageModal();
     }
+  };
+  
+  // 阻止图片点击事件冒泡，防止点击图片时关闭模态框
+  modalImage.onclick = (e) => {
+    e.stopPropagation();
   };
   
   // ESC键关闭模态框
