@@ -21,7 +21,6 @@ const letterContent = document.getElementById("letterContent");
 const imageGrid = document.getElementById("imageGrid");
 const imageModal = document.getElementById("imageModal");
 const modalImage = document.getElementById("modalImage");
-const closeModal = document.getElementById("closeModal");
 
 let current = {
   songIdx: null,
@@ -365,9 +364,6 @@ function init() {
       }
     }
   };
-  
-  // 模态框关闭事件
-  closeModal.onclick = closeImageModal;
   
   // 点击模态框关闭（点击背景或非图片区域）
   imageModal.onclick = (e) => {
