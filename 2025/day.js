@@ -173,10 +173,12 @@
       console.info("未找到对应 day 的 md，回退到默认页面：", error.message);
       window.SITE_DAY = null;
       try {
-        const params = new URLSearchParams(location.search);
+        let raw = location.hash.replace(/^#/, "");
+        if (raw.charAt(0) === "?") raw = raw.slice(1);
+        const params = new URLSearchParams(raw || location.search.replace(/^\?/, ""));
         params.delete("day");
         const query = params.toString();
-        history.replaceState(null, "", location.pathname + (query ? "?" + query : "") + location.hash);
+        history.replaceState(null, "", location.pathname + (query ? "#" + query : ""));
       } catch (_) {}
       const ok = window.applyYearRoute();
       return ok ? "fallback-ok" : "fallback-redirect";

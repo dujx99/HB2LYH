@@ -6,12 +6,25 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>小梨老师生日快乐 🎂</title>
   <!-- 站点入口：只负责把请求转到对应年份的代码目录，参数原样保留。
+       参数放在 hash 里（#year=2025），因为当前静态托管会对带查询字符串的页面返回 404。
        新增年份时，把年份登记到 AVAILABLE_YEARS 并在根目录建同名代码文件夹即可。 -->
   <script>
     (function () {
       const AVAILABLE_YEARS = [2025];
-      const params = new URLSearchParams(location.search);
+      function readParams() {
+        let raw = location.hash.replace(/^#/, "");
+        if (raw.charAt(0) === "?") raw = raw.slice(1);
+        return new URLSearchParams(raw || location.search.replace(/^\?/, ""));
+      }
+      const params = readParams();
       const latestYear = Math.max(...AVAILABLE_YEARS);
+
+      // song 优先级最高：带 song 时直接进 2025 的播放页，忽略 day / year
+      if (params.get("song") !== null) {
+        const query = params.toString();
+        location.replace("2025/home.html" + (query ? "#" + query : ""));
+        return;
+      }
 
       // day 优先：带合法 day 时完全忽略 year，落到最新可用年份的页面
       const rawDay = params.get("day");
@@ -26,7 +39,7 @@
       }
 
       const query = params.toString();
-      location.replace(targetYear + "/index.html" + (query ? "?" + query : "") + location.hash);
+      location.replace(targetYear + "/home.html" + (query ? "#" + query : ""));
     })();
   </script>
 </head>
