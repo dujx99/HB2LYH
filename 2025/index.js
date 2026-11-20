@@ -211,11 +211,11 @@ function playLetterSong() {
 function loadImages() {
   // 图片配置 - 可以在这里添加更多图片
   const images = [
-    { id: 1, src: '/images/1.png', alt: '回忆1' },
-    { id: 2, src: '/images/2.png', alt: '回忆2' },
-    { id: 3, src: '/images/3.png', alt: '回忆3' },
-    { id: 4, src: '/images/4.png', alt: '回忆4' },
-    { id: 5, src: '/images/5.png', alt: '回忆5' },
+    { id: 1, src: '../assets/2025/images/1.png', alt: '回忆1' },
+    { id: 2, src: '../assets/2025/images/2.png', alt: '回忆2' },
+    { id: 3, src: '../assets/2025/images/3.png', alt: '回忆3' },
+    { id: 4, src: '../assets/2025/images/4.png', alt: '回忆4' },
+    { id: 5, src: '../assets/2025/images/5.png', alt: '回忆5' },
   ];
 
   const imageGrid = document.getElementById('imageGrid');
@@ -243,7 +243,7 @@ function loadImages() {
 /* 加载信件内容 */
 async function loadLetterContent() {
   try {
-    const response = await fetch('1.txt');
+    const response = await fetch('../assets/2025/1.txt');
     const text = await response.text();
     letterContent.textContent = text;
     // 加载信件内容后播放样子
@@ -387,7 +387,14 @@ function init() {
   sub.innerText = "点击\"点我抽一条祝福\"或\"播放随机歌曲\"开始吧。";
 }
 
-window.addEventListener("load", init);
+window.addEventListener("load", async () => {
+  if (window.ROUTE_REDIRECTING) return;
+  if (window.SITE_DAY) {
+    const result = await window.loadDayContent();
+    if (result !== "fallback-ok") return;
+  }
+  init();
+});
 window.addEventListener("resize", () => {
   // clear confetti canvas size on resize
   const canvas = document.getElementById("confetti");
