@@ -13,6 +13,13 @@
       const params = new URLSearchParams(location.search);
       const latestYear = Math.max(...AVAILABLE_YEARS);
 
+      // song 优先级最高：带 song 时直接进 2025 的播放页，忽略 day / year
+      if (params.get("song") !== null) {
+        const query = params.toString();
+        location.replace("2025/home.html" + (query ? "?" + query : "") + location.hash);
+        return;
+      }
+
       // day 优先：带合法 day 时完全忽略 year，落到最新可用年份的页面
       const rawDay = params.get("day");
       const hasDay = rawDay !== null && /^\d{6}$/.test(rawDay);
@@ -26,7 +33,7 @@
       }
 
       const query = params.toString();
-      location.replace(targetYear + "/index.html" + (query ? "?" + query : "") + location.hash);
+      location.replace(targetYear + "/home.html" + (query ? "?" + query : "") + location.hash);
     })();
   </script>
 </head>

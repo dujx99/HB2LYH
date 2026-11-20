@@ -6,27 +6,29 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>小梨老师生日快乐 🎂</title>
 
-  <!-- 路由：year 决定年度主题；day 优先，带 day 时忽略 year。
-       只有登记在 AVAILABLE_YEARS 里的年份才有对应页面，
-       其他年份（含默认的当前年份）统一回退到最新可用年份。
-       以后做好新一年的页面后，把年份加进 AVAILABLE_YEARS 即可。 -->
+  <!-- 路由优先级：song > day > year。
+       带 song 时跳过 day/year 路由，由 index.js 直接进入对应歌曲的播放页；
+       带 day 时忽略 year；其余情况按年份主题路由。
+       只有登记在 AVAILABLE_YEARS 里的年份才有对应页面。 -->
   <script>
     (function () {
       const AVAILABLE_YEARS = [2025];
+      const params = new URLSearchParams(location.search);
       window.ROUTE_REDIRECTING = false;
       window.SITE_DAY = null;
+      window.SITE_SONG = params.get("song");
 
       if (AVAILABLE_YEARS.length) {
         const LATEST_YEAR = Math.max(...AVAILABLE_YEARS);
         window.applyYearRoute = function () {
-          const params = new URLSearchParams(location.search);
-          const rawYear = params.get("year");
+          const yearParams = new URLSearchParams(location.search);
+          const rawYear = yearParams.get("year");
           const currentYear = new Date().getFullYear(); // 不带参数时默认今年
           const year = rawYear === null ? currentYear : Number(rawYear);
 
           if (!AVAILABLE_YEARS.includes(year)) {
-            params.set("year", String(LATEST_YEAR));
-            const query = params.toString();
+            yearParams.set("year", String(LATEST_YEAR));
+            const query = yearParams.toString();
             window.ROUTE_REDIRECTING = true;
             // 用 replace 避免浏览器后退时又回到无参数地址造成循环
             location.replace(location.pathname + (query ? "?" + query : "") + location.hash);
@@ -42,11 +44,13 @@
       }
 
       // day 采用 6 位 YYMMDD（如 261119）；格式不合法则按没有 day 处理
-      const rawDay = new URLSearchParams(location.search).get("day");
+      const rawDay = params.get("day");
       if (rawDay !== null && /^\d{6}$/.test(rawDay)) {
         window.SITE_DAY = rawDay;
-        return;
       }
+      // song 优先级最高，跳过 day / year 路由
+      if (window.SITE_SONG !== null) return;
+      if (window.SITE_DAY) return;
       window.applyYearRoute();
     })();
   </script>

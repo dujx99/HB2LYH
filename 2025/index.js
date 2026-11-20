@@ -1,5 +1,6 @@
 const qs = new URLSearchParams(location.search);
 const presetSongIdx = qs.get("song"); // optional index to force a song
+const hasValidSong = presetSongIdx !== null && /^\d+$/.test(presetSongIdx) && AUDIO_LIST[presetSongIdx] !== undefined;
 const messageEl = document.getElementById("message");
 const headline = document.getElementById("headline");
 const sub = document.getElementById("sub");
@@ -294,11 +295,7 @@ function init() {
   applyPalette(pIdx);
   // choose message and song
   let songIdx;
-  if (
-    presetSongIdx !== null &&
-    presetSongIdx !== undefined &&
-    AUDIO_LIST[presetSongIdx]
-  ) {
+  if (hasValidSong) {
     songIdx = Number(presetSongIdx);
     showLyric(AUDIO_LIST[presetSongIdx].lyrics);
   } else {
@@ -385,11 +382,24 @@ function init() {
   });
   
   sub.innerText = "点击\"点我抽一条祝福\"或\"播放随机歌曲\"开始吧。";
+
+  // 带合法 song 时跳过蛋糕页，直接进入播放页并播放对应歌曲
+  if (hasValidSong) {
+    switchPage(page1, page2);
+    playSong(songIdx, false, true);
+  }
 }
 
 window.addEventListener("load", async () => {
   if (window.ROUTE_REDIRECTING) return;
-  if (window.SITE_DAY) {
+  // song 无效时清掉标记，回退到常规的 day / year 流程
+  if (window.SITE_SONG !== null && !hasValidSong) {
+    window.SITE_SONG = null;
+    window.applyYearRoute();
+    if (window.ROUTE_REDIRECTING) return;
+  }
+  // song 存在时优先处理歌曲，不加载 day 内容
+  if (window.SITE_SONG === null && window.SITE_DAY) {
     const result = await window.loadDayContent();
     if (result !== "fallback-ok") return;
   }
